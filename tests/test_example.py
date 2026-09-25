@@ -1,4 +1,4 @@
-import task_list
+import src.task_list as task_list
 from pathlib import Path
 import json
 
@@ -25,7 +25,7 @@ def test_delete_valid_id():
     assert tasks[0]["id"] != 1
 
 def test_load_id_counter():
-    filePath = Path("E:/Python learning/task_id_counter.txt")
+    filePath = Path("E:/Python learning/data/task_id_counter.txt")
     idCounter = task_list.load_id_counter()
 
     if filePath.exists():
@@ -36,7 +36,7 @@ def test_load_id_counter():
 
 def test_save_id_counter():
     task_list.save_id_counter(4)
-    filePath = Path("E:/Python learning/task_id_counter.txt")
+    filePath = Path("E:/Python learning/data/task_id_counter.txt")
 
     idCounter = int(filePath.read_text(encoding="utf-8"))
     assert idCounter == 4
@@ -44,14 +44,14 @@ def test_save_id_counter():
 def test_save_tasks():
     tasks = [{"id": 1, "task": "learn python", "isFinished": False},{"id": 2, "task": "do hw", "isFinished": False}]
     task_list.save_tasks(tasks)
-    file_path = Path("E:/Python learning/task_list.json")
+    file_path = Path("E:/Python learning/data/task_list.json")
 
     assert task_list.load_tasks() == tasks
 
 
 def test_load_tasks():
     tasks = task_list.load_tasks()
-    filePath = Path("E:/Python learning/task_list.json")
+    filePath = Path("E:/Python learning/data/task_list.json")
 
     if filePath.exists():
         with open(filePath,"r") as file:
