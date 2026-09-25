@@ -5,25 +5,25 @@ import time
 #load in ongoing id counter to maintain unique ids for each task
 def load_id_counter():
     try:
-        with open('task_id_counter.txt','r',encoding='utf-8') as file:
+        with open('data/task_id_counter.txt','r',encoding='utf-8') as file:
             return int(file.read())
     except FileNotFoundError:
         return 1
 
 #save the id counter to txt file once program is done running
 def save_id_counter(task_id: int):
-    with open('task_id_counter.txt','w',encoding='utf-8') as file:
+    with open('data/task_id_counter.txt','w',encoding='utf-8') as file:
         file.write(str(task_id))
 
 #load existing list of tasks or create a new one if it DNE
 def save_tasks(tasks :list[dict]):
-    with open('task_list.json','w') as file:
+    with open('data/task_list.json','w') as file:
         json.dump(tasks,file)
 
 def load_tasks() -> list[dict]:
     tasks: list[dict]
     try:
-        with open('task_list.json','r',encoding='utf-8') as file:
+        with open('data/task_list.json','r',encoding='utf-8') as file:
             print("Existing task list found!")
             print("loading in...")
             tasks = json.load(file)

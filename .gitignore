@@ -2,5 +2,4 @@ __pycache__/
 .vscode/
 .venv/
 .pytest_cache/
-task_id_counter.txt
-task_list.json
+data/
