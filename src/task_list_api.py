@@ -26,3 +26,12 @@ def add_task(toDo: Todo):
           "task": toDo.task,
           "isFinished": False
      }
+
+@app.put("/tasks/{taskId}")
+def update_task(taskId: str):
+
+     currentTasks = task_list.load_tasks()
+     task_list.update_task(currentTasks,[taskId])
+     task_list.save_tasks(currentTasks)
+     return task_list.find_task(task_list.load_tasks(),int(taskId))
+     #to return a task we can use our find function since we have the id
