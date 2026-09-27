@@ -54,6 +54,7 @@ def delete_task(tasks :list[dict], task: list[str]):
     taskToRemove = find_task(tasks, taskId)
     if taskToRemove:
         tasks.remove(taskToRemove)
+        return taskToRemove
     else:
         print(f"task with id {taskId} not found!")
     return
@@ -78,6 +79,7 @@ def finish_task(tasks: list, task: list[str]):
     taskToFinish = find_task(tasks,taskId)
     if taskToFinish:
         taskToFinish['isFinished'] = True
+        return taskToFinish
     else:
         print(f"task with id {taskId} not found!")
     return
