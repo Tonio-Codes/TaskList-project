@@ -67,6 +67,7 @@ def update_task(tasks :list, task: list[str]):
     taskToUpdate = find_task(tasks, taskId)
     if taskToUpdate:
         taskToUpdate["task"] = newTask
+        return taskToUpdate
     else:
         print(f"task with id {taskId} not found!")
     return
