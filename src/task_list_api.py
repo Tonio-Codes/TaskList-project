@@ -33,12 +33,8 @@ def add_task(toDo: ToDoCreate):
      task_list.save_tasks(currentTasks)
      task_list.save_id_counter(newIdCounter)
 
-     return {
-          
-          "id" : currentId,
-          "task": toDo.task,
-          "isFinished": False
-     }
+     return TaskResponse(id=currentId, task=toDo.task, isFinished=False)
+
 
 @app.put("/tasks/{taskId}",response_model=TaskResponse)
 def update_task(taskId: str, toDo: ToDoCreate):
