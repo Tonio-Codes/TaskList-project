@@ -1,6 +1,8 @@
-from fastapi import FastAPI, HTTPException, status
-from . import task_list
+from fastapi import FastAPI, HTTPException, status, Depends
 from pydantic import BaseModel
+from .database import get_db
+from sqlalchemy.orm import Session
+from . import task_list, crud
 
 class ToDoCreate(BaseModel):
      task: str = ""
@@ -13,8 +15,8 @@ class TaskResponse(BaseModel):
 app = FastAPI()
 
 @app.get("/tasks")
-def get_tasks():
-    return task_list.load_tasks()
+def get_tasks(db : Session = Depends(get_db)):
+    return crud.get_tasks(db)
 
 @app.get("/tasks/{taskId}")
 def get_task_by_id(taskId: int):
