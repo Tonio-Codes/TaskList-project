@@ -1,72 +1,57 @@
 from fastapi import FastAPI, HTTPException, status, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from .database import get_db
 from sqlalchemy.orm import Session
-from . import task_list, crud
+from . import crud
 
 class ToDoCreate(BaseModel):
-     task: str = ""
+     task: str = Field(default="",min_length=1)
 
 class TaskResponse(BaseModel):
+     model_config = ConfigDict(from_attributes=True)
      id: int
      task: str
-     isFinished: bool
+     is_finished: bool
 
 app = FastAPI()
 
-@app.get("/tasks")
+@app.get("/tasks",response_model=list[TaskResponse])
 def get_tasks(db : Session = Depends(get_db)):
     return crud.get_tasks(db)
 
-@app.get("/tasks/{taskId}")
-def get_task_by_id(taskId: int):
-    currentTasks = task_list.load_tasks()
-    task = task_list.find_task(currentTasks, taskId)
+
+@app.get("/tasks/{taskId}", response_model=TaskResponse)
+def get_task_by_id(taskId: int,db: Session = Depends(get_db)):
+    task = crud.get_task(db,taskId)
     if not task:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"task with id of {taskId} not found!")
     return task
 
-@app.post("/tasks")
-def add_task(toDo: ToDoCreate):
-     currentTasks = task_list.load_tasks()
-     currentId = task_list.load_id_counter()
-     newIdCounter = task_list.add_task(currentTasks,[toDo.task],currentId)
-
-     task_list.save_tasks(currentTasks)
-     task_list.save_id_counter(newIdCounter)
-
-     return TaskResponse(id=currentId, task=toDo.task, isFinished=False)
-
+@app.post("/tasks", response_model=TaskResponse)
+def add_task(toDo: ToDoCreate, db: Session = Depends(get_db)):
+     new_task = crud.create_task(db,toDo.task)
+     return new_task
 
 @app.put("/tasks/{taskId}",response_model=TaskResponse)
-def update_task(taskId: str, toDo: ToDoCreate):
-     command :list[str] = []
-     command.append(taskId)
-     command.append(toDo.task)
-     currentTasks = task_list.load_tasks()
-     updatedTask = task_list.update_task(currentTasks,command)
+def update_task(taskId: int, toDo: ToDoCreate, db : Session = Depends(get_db)):
+     updatedTask = crud.update_task(db,taskId,toDo.task)
      if updatedTask:
-          task_list.save_tasks(currentTasks)
           return updatedTask
      else:
           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail= f"Task with id: {taskId} not found")
 
 @app.delete("/tasks/{taskId}")
-def delete_task(taskId: str):
-     currentTasks = task_list.load_tasks()
-     removedTask = task_list.delete_task(currentTasks,[taskId])
+def delete_task(taskId: int, db : Session = Depends(get_db)):
+     removedTask = crud.delete_task(db,taskId)
      if removedTask:
-          task_list.save_tasks(currentTasks)
           return {"message": "successfully deleted the task!"}
      else:
           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail= f"Task with id: {taskId} not found")
 
-@app.patch("/tasks/{taskid}", response_model=TaskResponse)
-def finish_task(taskId: str):
-     currentTasks = task_list.load_tasks()
-     finishedTask= task_list.finish_task(currentTasks,[taskId])
+@app.patch("/tasks/{taskId}", response_model=TaskResponse)
+def finish_task(taskId: int, db : Session = Depends(get_db)):
+     finishedTask = crud.finish_task(db, taskId)
      if finishedTask:
-          task_list.save_tasks(currentTasks)
           return finishedTask
      else:
           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail= f"Task with id: {taskId} not found")
